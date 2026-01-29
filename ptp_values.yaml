@@ -1,0 +1,260 @@
+global:
+  hub: "harbor.apps.ranmgmt-bs.mascotlab.com/5gptp/localhost"
+  imagePullSecretName: "harborcred"
+  oscoredump:
+    enabled: true
+    hostpath: "/var/lib/systemd/coredump"
+    pattern: "%P %u %g %s %t %c %h %e"
+  securityPolicy:
+    type: "scc"
+    name: "privileged"
+  Verifier:
+    k8sVersion: ">=1.17.0"
+    enable: true
+    iterationDelay: 60
+    serviceCount: 1
+    iterationCount: 5
+    annotationLabel: "charts.openshift.io/name"
+    annotationValue: "test"
+  cim_flag: true
+  reverse_proxy: false
+  mtcil:
+    use_release_ns: true
+    create_ns: false
+    kafka_svc_fqdn: "kafka-svc.mtcil-2.svc.cluster.local:9092"
+    etcd_svc_fqdn: "etcd.mtcil-2.svc.cluster.local:2379"
+    topo_engine_fqdn: "topo-engine.mtcil-2.svc.cluster.local:8080"
+    enableServiceprovisioning: true
+    enableConfigmapProvisioning: true
+  oamsidecar:
+    name: "cim"
+    tag: "23.2.1"
+  nf:
+    nfId: "ptp-1"
+    mtcilId: "mtcil2"
+  sriov: false
+  sriovRes: "intel.com/sriov_netT"
+  enableSC: false
+  basePath: "/var/home/core/data/storage"
+  userId: 1000
+  disableInit: false
+  pv:
+    shareSyncPv:
+      enable: false
+      name: "ptp-sync-pv"
+      accessMode: "ReadWriteOnce"
+      storageClass: "lvms-vg1"
+      size: "10Mi"
+    oc_mode_hostpath:
+      enable: true
+      hostPath: "/var/home/core/ptp"
+    size: "10Gi"
+    hostPath: "/var/home/core/data/storage"
+    confSize: "100Mi"
+    confPath: "/opt/mavenir/ptp"
+    imagename: "harbor.in.intinfra.com/mwppaas/busybox"
+    imagever: "1.31.1"
+    dhcpPv:
+      enable: false
+      size: "10Mi"
+      storageClass: "ls-fso"
+      accessMode: "ReadWriteOnce"
+  deployment_metaspec:
+    annotations:
+      mtcil.com/tmaas.nf.nfVersion: "5.0.774.10.P1"
+nf:
+  version: "5.0.774.10.P1"
+  vendorId: "mvnr"
+  nfClass: "appln"
+  nfType: "ptp"
+  name: "ptp"
+  cnftpl_configmap:
+    mgmt_cfg:
+      create: true
+      metaspec:
+        annotations:
+          configMgmt: "enabled"
+          mtcil.com/tmaas.nf.nfVersion: "5.0.774.10.P1"
+    static_cfg:
+      create: true
+      metaspec: {}
+    env_cfg:
+      create: false
+      metaspec: {}
+  cnftpl_secret:
+    create: false
+    metaspec: {}
+    secretspec: {}
+  cnftpl_namespaces:
+    create: false
+    metaspec: {}
+  cnftpl_dashboard:
+    create: false
+    metaspec: {}
+  cnftpl_eventdef:
+    create: false
+    metaspec: {}
+  cnftpl_alertsdef:
+    create: false
+    metaspec: {}
+  cnftpl_metricsdef:
+    create: false
+    metaspec: {}
+deployment:
+  metaspec:
+    labels:
+      app: "ptp"
+      svc: "ptpService"
+      mtcil.com/mmaas_clock_aligned: "true"
+      mtcilId: "mtcil2"
+      environment: "dev"
+      Group: "ran"
+      Vendor: "mv"
+      Function: "DU"
+      NFName: "upx-123-xxx"
+      SiteID: "SLAD90010"
+      Release: "5.0.774.10.P1"
+    annotations:
+      topogw.fqdn: "topo-gw.mtcil-2.svc.cluster.local:8080"
+      sidecar.istio.io/inject: "true"
+      mtcil.com/tmaas.nf.nfVersion: "5.0.774.10.P1"
+      prometheus.io/scrape: "false"
+      prometheus.io/path: "/metrics"
+      prometheus.io/port: "8081"
+      prometheus.io/scheme: "http"
+      mtcil.com/mmaas: "{ \"scrape\": \"false\", \"path\": \"/metrics\", \"ports\": [\"8081\"], \"scheme\": \"http\", \"measurementInterval\": \"60s\", \"maxRetention\": \"5\", \"multiPrometheusClockAlignedScrape\": false }"
+PTP:
+  dnsConfig:
+    Enable: false
+    ndots: "5"
+  image:
+    pullSecret: 
+    name: "ptp"
+    repository: "harbor.apps.ranmgmt-bs.mascotlab.com/5gptp/localhost"
+    tag: "mvrp-ptp-x86-cent79_5.0.774.10.P1"
+    pullPolicy: "IfNotPresent"
+  replicas: 1
+  appname: "ptp"
+  account: "ptpaccount"
+  ptp_slave: "ens2f3"
+  ptp_master: "ens2f2,ens2f1"
+  cpuCore: 38
+  phcCpuCore: 38
+  synce_enable: false
+  synce_esmc_enable: false
+  ptp_bc_mode: false
+  acceptance_list_of_ssm: "PRC,SSU_A"
+  ssm_timeout: 24
+  LivenessProbePort: 2900
+  ReadinessProbePort: 2901
+  probeTcpIpVersion: "IPV4"
+  ts2phc_intf_list: "ens2f3"
+  ts2phc_nmea_serialport: "/dev/gnss0"
+  skip_1sec_ts2phc_cnt: 120
+  all_dpll_lock_wait: true
+  enable_1PPS: true
+  SMA1_output: "ens2f3"
+  SMA1_input: "ens3f1"
+  SMA2_output: ""
+  SMA2_input: ""
+  UFL1_output: ""
+  UFL2_input: ""
+  holdoverperiod: 240
+  offsetvalue: 100
+  domainNumber: 24
+  ptpProfile: "G_8275_1"
+  multicastMacAddress: "FORWARDABLE"
+  delayAsymmetry: 0
+  logMinPdelayReqInterval: -4
+  PTPFeatureFlag: "e_enable"
+  PTPMode: "C1"
+  clock_classes: 3
+  clockClassThreshold: 165
+  reportingPeriod: 10
+  logInterDelayPeriod: 0
+  assume_two_step: 0
+  oamSideCarImage: "harbor.apps.ranmgmt-bs.mascotlab.com/5gptp/localhost/cim:23.2.1"
+  cfgMgmtPort: "9001"
+  prometheusPort: "8081"
+  SKIP_MULTI_REG_CHECK: true
+  ptpConfig: "/opt/config/ptp.json"
+  ha:
+    monitoringMode: "k8s"
+  ports:
+    - name: "nats"
+      protocol: "TCP"
+      port: 4222
+    - name: "config"
+      protocol: "TCP"
+      port: 9001
+    - name: "pcli"
+      protocol: "TCP"
+      port: 5555
+    - name: "metricsapp"
+      protocol: "TCP"
+      port: 8081
+    - name: "metrics"
+      protocol: "TCP"
+      port: 6060
+  volumemounts:
+    - path: "/opt/ptpconfigvol"
+      name: "ptp-config-volume"
+      readOnly: false
+    - path: "/opt/ptpeventvol"
+      name: "ptp-event-volume"
+      readOnly: false
+    - path: "/sys"
+      name: "flex"
+      readOnly: false
+    - path: "/dev"
+      name: "dev"
+      readOnly: false
+    - path: "/var/run/netns"
+      name: "netns"
+      readOnly: false
+  volumes:
+    - name: "flex"
+      hostpath: "/sys"
+    - name: "dev"
+      hostpath: "/dev"
+    - name: "netns"
+      hostpath: "/var/run/netns"
+    - name: "hugepage"
+      hostpath: "/hugepages"
+    - name: "dhcp-lease"
+      hostpath: "/opt/mavenir/dhcp"
+  nodeSelector:
+    labelKey: "5gdu"
+    labelValue: "true"
+  resources:
+    limits:
+      memory: "1Gi"
+      cpu: "2"
+    requests:
+      memory: "1Gi"
+      cpu: "2"
+DHCP:
+  ptp_enable: true
+  dhcp_enable: false
+  dhcp_ip_version: "IPV4"
+  dhcp_sriov: false
+  dhcp_type: "dynamic"
+  interface: "ens2f2.3019,ens3f2.3020"
+  lease: "2592000"
+  nat_interface: "ens3f0.3006"
+  encaps_header: "81:04"
+  encaps_sdaas: "10.0.10.54"
+  encaps_du: "172.16.11.114,172.16.11.130"
+  dhcp_ip_subnet: "172.16.11.112/28,172.16.11.128/28"
+  radvd_ip_subnet: ""
+  ip_range_start: "172.16.11.115,172.16.11.130"
+  ip_range_end: "172.16.11.115,172.16.11.130"
+ptp_dhcp_netattchdef:
+  name: "ptp-dhcp"
+  vlan: ""
+  dpdk_resource: ""
+  type: "sriov"
+  ipamtype: "host-local"
+  ipamsubnet: "2605:c540:8c00:200::/64"
+  ipamrangestart: "2605:c540:8c00:200::56"
+  ipamsrangeend: "2605:c540:8c00:200::56"
